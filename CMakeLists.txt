@@ -50,6 +50,7 @@ target_link_libraries(client PRIVATE
     SmartSocket
     Base64
     MailMessage
+    SendUtilities
     ${Boost_LIBRARIES}
 )
 

@@ -85,6 +85,39 @@ namespace ISXSC
         return future;
     };
 
+    future<void> SmtpClient::AsyncSendMail(const ISXMM::MailMessage& mail_message)
+    {
+        std::promise<void> promise;
+        future<void> future = promise.get_future();
+
+        asio::spawn(
+            m_smart_socket.GetIoContext()
+            , [this, mail_message, promise = std::move(promise)](asio::yield_context yield)
+            mutable
+            {   
+                // from address
+                AsyncSendMailFromCmd(mail_message, yield);
+                std::cout << m_smart_socket.AsyncReadCoroutine(yield);
+
+                AsyncSendRcptToCmd(mail_message, yield);
+
+                AsyncSendDataCmd(yield);
+                std::cout << m_smart_socket.AsyncReadCoroutine(yield);
+
+                ISXUtilities::AsyncSendMailHeaders(mail_message, m_smart_socket, yield);
+                ISXUtilities::AsyncSendMailBody(mail_message, m_smart_socket, yield);
+                ISXUtilities::AsyncSendAttachments(mail_message, m_smart_socket, yield);
+                m_smart_socket.AsyncWriteCoroutine("\r\n.\r\n", yield);
+
+                std::cout << m_smart_socket.AsyncReadCoroutine(yield);
+
+                promise.set_value();
+            }
+        );
+
+        return future;
+    };
+
     bool SmtpClient::Dispose()
     {
         return m_smart_socket.Close();
@@ -115,16 +148,16 @@ namespace ISXSC
         return m_smart_socket.AsyncUpgradeSecurityCoroutine(yield);
     };
 
-    bool SmtpClient::AsyncSendMailFromCmd(ISXMM::MailMessage& mail_message, asio::yield_context& yield)
+    bool SmtpClient::AsyncSendMailFromCmd(const ISXMM::MailMessage& mail_message, asio::yield_context& yield)
     {
         string query = (format("%1%: <%2%> \r\n")
             % S_CMD_MAIL_FROM
             % mail_message.from.get_address()).str();
-
+    
         return m_smart_socket.AsyncWriteCoroutine(query, yield);
     };
 
-    bool SmtpClient::AsyncSendRcptToCmd(ISXMM::MailMessage& mail_message, asio::yield_context& yield)
+    bool SmtpClient::AsyncSendRcptToCmd(const ISXMM::MailMessage& mail_message, asio::yield_context& yield)
     {
         for (auto& to : mail_message.to)
         {

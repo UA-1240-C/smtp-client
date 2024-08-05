@@ -3,6 +3,7 @@
 #include "SmartSocket.h"
 #include "Base64.h"
 #include "MailMessage.h"
+#include "SendUtilities.h"
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -40,6 +41,8 @@ namespace ISXSC
 
         future<void> AsyncConnect(const string& server, int port);
         future<void> AsyncAuthenticate(const string& username, const string& password);
+        future<void> AsyncSendMail(const ISXMM::MailMessage& message);
+        
         bool Dispose();
 
         bool SetTimeout(int timeout);
@@ -56,8 +59,8 @@ namespace ISXSC
         bool AsyncSendEhloCmd(asio::yield_context& yield);
         bool AsyncSendStartTlsCmd(asio::yield_context& yield);
         bool AsyncUpgradeSecurity(asio::yield_context& yield);
-        bool AsyncSendMailFromCmd(ISXMM::MailMessage& mail_message, asio::yield_context& yield);
-        bool AsyncSendRcptToCmd(ISXMM::MailMessage& mail_message, asio::yield_context& yield);
+        bool AsyncSendMailFromCmd(const ISXMM::MailMessage& mail_message, asio::yield_context& yield);
+        bool AsyncSendRcptToCmd(const ISXMM::MailMessage& mail_message, asio::yield_context& yield);
         bool AsyncSendDataCmd(asio::yield_context& yield);
         bool AsyncSendQuitCmd(asio::yield_context& yield);
     };
