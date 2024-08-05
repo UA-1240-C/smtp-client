@@ -35,7 +35,10 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/Base64)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/SmartSocket)
 
 # Add subdirectory for the MailMessage library
-add_subdirectory(libs/MailMessage)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/MailMessage)
+
+# Add subdirectory for the MailMessageUtilities library
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/SendUtilities)
 
 # Add subdirectory for the tests
 add_subdirectory(tests)
