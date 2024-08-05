@@ -2,6 +2,7 @@
 
 #include "SmartSocket.h"
 #include "Base64.h"
+#include "MailMessage.h"
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -28,7 +29,7 @@ namespace ISXSC
         inline static const string S_CMD_STARTTLS = "STARTTLS";
         inline static const string S_CMD_AUTH_PLAIN = "AUTH PLAIN";
         inline static const string S_CMD_MAIL_FROM = "MAIL FROM";
-        inline static const string S_CMD_RCPT_TO = "MAIL TO";
+        inline static const string S_CMD_RCPT_TO = "RCPT TO";
         inline static const string S_CMD_DATA = "DATA";
         inline static const string S_CMD_QUIT = "QUIT";
 
@@ -52,13 +53,12 @@ namespace ISXSC
 
         int m_timeout;
 
-        bool SendMailFromCmd();
-        bool SendRcptToCmd();
-        bool SendDataCmd();
-        bool SendQuitCmd();
-
         bool AsyncSendEhloCmd(asio::yield_context& yield);
         bool AsyncSendStartTlsCmd(asio::yield_context& yield);
         bool AsyncUpgradeSecurity(asio::yield_context& yield);
+        bool AsyncSendMailFromCmd(ISXMM::MailMessage& mail_message, asio::yield_context& yield);
+        bool AsyncSendRcptToCmd(ISXMM::MailMessage& mail_message, asio::yield_context& yield);
+        bool AsyncSendDataCmd(asio::yield_context& yield);
+        bool AsyncSendQuitCmd(asio::yield_context& yield);
     };
 }; // namespace ISXSC

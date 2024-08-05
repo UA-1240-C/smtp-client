@@ -114,4 +114,37 @@ namespace ISXSC
     {
         return m_smart_socket.AsyncUpgradeSecurityCoroutine(yield);
     };
+
+    bool SmtpClient::AsyncSendMailFromCmd(ISXMM::MailMessage& mail_message, asio::yield_context& yield)
+    {
+        string query = (format("%1%: <%2%> \r\n")
+            % S_CMD_MAIL_FROM
+            % mail_message.from.get_address()).str();
+
+        return m_smart_socket.AsyncWriteCoroutine(query, yield);
+    };
+
+    bool SmtpClient::AsyncSendRcptToCmd(ISXMM::MailMessage& mail_message, asio::yield_context& yield)
+    {
+        for (auto& to : mail_message.to)
+        {
+            string query = (format("%1%: <%2%> \r\n")
+                % S_CMD_RCPT_TO
+                % to.get_address()).str();
+
+            m_smart_socket.AsyncWriteCoroutine(query, yield);
+        }
+
+        return true;
+    }
+
+    bool SmtpClient::AsyncSendDataCmd(asio::yield_context& yield)
+    {
+        return m_smart_socket.AsyncWriteCoroutine(S_CMD_DATA + "\r\n", yield);
+    };
+
+    bool SmtpClient::AsyncSendQuitCmd(asio::yield_context& yield)
+    {
+        return m_smart_socket.AsyncWriteCoroutine(S_CMD_QUIT + "\r\n", yield);
+    };
 }; // namespace ISXSC

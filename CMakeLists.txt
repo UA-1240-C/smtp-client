@@ -46,6 +46,7 @@ target_link_libraries(client PRIVATE
     OpenSSL::Crypto
     SmartSocket
     Base64
+    MailMessage
     ${Boost_LIBRARIES}
 )
 
