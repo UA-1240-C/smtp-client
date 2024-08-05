@@ -37,6 +37,20 @@ int main()
 
     smtp_client.AsyncAuthenticate("username", "password").get();
 
+    ISXMM::MailMessageBuilder mail_builder;
+
+    mail_builder.SetFrom("johndoe@gmail.com", "John Doe")
+        .AddTo("emmadoe84@gmail.com", "Emma Doe")
+        .SetSubject("Testing mail")
+        .SetBody("Here are three more files for you:")
+        .AddAttachment("/home/123.txt")
+        .AddAttachment("/media/123.png")
+        .AddAttachment("/home/123.pdf");
+
+    ISXMM::MailMessage mail_message = mail_builder.Build();
+
+    smtp_client.AsyncSendMail(mail_message).get();
+
     // Stop the io_context to finish processing
     io_context.stop();
     
