@@ -159,15 +159,18 @@ namespace ISXSC
 
     bool SmtpClient::AsyncSendRcptToCmd(const ISXMM::MailMessage& mail_message, asio::yield_context& yield)
     {
-        for (auto& to : mail_message.to)
+        for (auto&group : {mail_message.to, mail_message.cc, mail_message.bcc})
         {
-            string query = (format("%1%: <%2%> \r\n")
-                % S_CMD_RCPT_TO
-                % to.get_address()).str();
+            for (auto& to : group)
+            {
+                string query = (format("%1%: <%2%> \r\n")
+                    % S_CMD_RCPT_TO
+                    % to.get_address()).str();
 
-            m_smart_socket.AsyncWriteCoroutine(query, yield);
+                m_smart_socket.AsyncWriteCoroutine(query, yield);
+            }
         }
-
+        
         return true;
     }
 

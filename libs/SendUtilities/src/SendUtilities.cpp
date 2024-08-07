@@ -24,6 +24,9 @@ namespace ISXUtilities
 
     bool AsyncSendAttachments(const ISXMM::MailMessage& message, ISXSmartSocket::SmartSocket& smart_socket, asio::yield_context& yield)
     {
+        if (message.attachments.empty())
+            return true;
+            
         for (auto& attachment : message.attachments)
         {
             smart_socket.AsyncWriteCoroutine("--" + ISXMM::MailMessageFormatter::boundary + "\r\n", yield);
