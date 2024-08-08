@@ -18,7 +18,7 @@ target_sources(client PRIVATE
 )
 
 # Include directories for the client target
-target_include_directories(client PRIVATE
+target_include_directories(client PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${Boost_INCLUDE_DIRS}
 )
