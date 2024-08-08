@@ -11,12 +11,10 @@ find_package(OpenSSL REQUIRED)
 find_package(Boost 1.70 REQUIRED COMPONENTS system coroutine)
 
 # Add executable target
-add_executable(client)
-
+add_library(client)
 # Specify source files
 target_sources(client PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SmtpClient.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
 
 # Include directories for the client target
