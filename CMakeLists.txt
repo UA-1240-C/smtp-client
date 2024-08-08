@@ -42,7 +42,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/SendUtilities)
 add_subdirectory(tests)
 
 # Link libraries to the client target
-target_link_libraries(client PRIVATE
+target_link_libraries(client PUBLIC
     OpenSSL::SSL
     OpenSSL::Crypto
     SmartSocket
