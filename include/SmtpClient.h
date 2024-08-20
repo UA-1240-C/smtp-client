@@ -11,7 +11,6 @@
 using namespace boost;
 using std::string;
 using std::unique_ptr;
-using std::string;
 using std::future;
 
 using asio::ip::tcp;
@@ -42,6 +41,8 @@ public:
     future<void> AsyncQuit();
     bool Dispose();
 
+    bool ConnectionIsOpen();
+
     bool SetTimeout(int timeout);
 
 private:
@@ -53,8 +54,8 @@ private:
 
     int m_timeout;
 
-    bool AsyncSendMailFromCmd(const ISXMM::MailMessage& mail_message, asio::yield_context& yield);
-    bool AsyncSendRcptToCmd(const ISXMM::MailMessage& mail_message, asio::yield_context& yield);
+    bool AsyncSendMailFromCmd(const ISXMM::MailAddress& mail_message, asio::yield_context& yield);
+    bool AsyncSendRcptToCmd(const ISXMM::MailAddress& mail_address, asio::yield_context& yield);
     bool AsyncSendDataCmd(asio::yield_context& yield);
     bool AsyncSendQuitCmd(asio::yield_context& yield);
 
