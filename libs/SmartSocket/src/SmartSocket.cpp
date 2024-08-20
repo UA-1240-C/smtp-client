@@ -57,9 +57,14 @@ int SmartSocket::GetServerPort() const
     return server_port;
 };
 
-boost::asio::io_context& SmartSocket::GetIoContext()
+asio::io_context& SmartSocket::GetIoContext()
 {
     return m_io_context;
+};
+
+asio::ssl::context& SmartSocket::GetSslContext()
+{
+    return m_ssl_context;
 };
 
 bool SmartSocket::SetTimeout(int timeout)
@@ -136,7 +141,6 @@ bool SmartSocket::AsyncUpgradeSecurityCoroutine(asio::yield_context& yield)
 bool SmartSocket::Close()
 {
     system::error_code ec;
-    m_socket.shutdown(ec);
     m_socket.lowest_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     m_socket.lowest_layer().cancel(ec);
     m_socket.lowest_layer().close(ec);
