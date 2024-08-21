@@ -174,7 +174,7 @@ future<void> SmtpClient::AsyncSendMail(const ISXMM::MailMessage& mail_message)
                 {
                     return m_smart_socket->AsyncWriteCoroutine(query, yield);
                 });
-                message_sender.SendMessage();
+                message_sender.SendMailMessage();
 
                 m_smart_socket->AsyncWriteCoroutine("\r\n.\r\n", yield);
                 ISXResponse::SMTPResponse::CheckStatus(
