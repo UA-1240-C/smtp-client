@@ -17,25 +17,19 @@ SmtpClient::SmtpClient(asio::io_context& io_context, asio::ssl::context& ssl_con
 
 SmtpClient::~SmtpClient()
 {
-    std::promise<void> promise;
-    std::future<void> future = promise.get_future();
-
-    asio::spawn(m_smart_socket->GetIoContext()
-        , [this, promise = std::move(promise)](asio::yield_context yield)
-        mutable
-        {
-            AsyncSendQuitCmd(yield);
-            promise.set_value();
-        }
-    );
-
-    try{
-        future.get();
-        delete m_smart_socket.release();
-    } catch (const std::exception& e)
+    try
     {
-        std::cerr << "Exception in destructor called" << std::endl;
-    };
+        if (m_smart_socket->IsOpen())
+        {
+            AsyncQuit().get();
+        };
+
+        delete m_smart_socket.release();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "Exception in destructor catched while quitting, session could have been broken: " << e.what() << std::endl;
+    }
 };
 
 future<void> SmtpClient::AsyncConnect(const string& server, int port)
@@ -158,13 +152,19 @@ future<void> SmtpClient::AsyncSendMail(const ISXMM::MailMessage& mail_message)
         {   
             try
             {
-                AsyncSendMailFromCmd(mail_message, yield);
+                AsyncSendMailFromCmd(mail_message.from, yield);
                 ISXResponse::SMTPResponse::CheckStatus(
                     m_smart_socket->AsyncReadCoroutine(yield), ISXResponse::StatusType::PositiveCompletion);
 
-                AsyncSendRcptToCmd(mail_message, yield);
-                ISXResponse::SMTPResponse::CheckStatus(
-                    m_smart_socket->AsyncReadCoroutine(yield), ISXResponse::StatusType::PositiveCompletion);
+                for (auto &group : {mail_message.to, mail_message.cc, mail_message.bcc})
+                {
+                    for (auto& to : group)
+                    {
+                        AsyncSendRcptToCmd(to, yield);
+                        ISXResponse::SMTPResponse::CheckStatus(
+                            m_smart_socket->AsyncReadCoroutine(yield), ISXResponse::StatusType::PositiveCompletion);
+                    }
+                }
 
                 AsyncSendDataCmd(yield);
                 ISXResponse::SMTPResponse::CheckStatus(
@@ -192,9 +192,49 @@ future<void> SmtpClient::AsyncSendMail(const ISXMM::MailMessage& mail_message)
     return future;
 };
 
+future<void> SmtpClient::AsyncQuit()
+{
+    std::promise<void> promise;
+    future<void> future = promise.get_future();
+
+    asio::spawn(
+        m_smart_socket->GetIoContext()
+        , [this, promise = std::move(promise)](asio::yield_context yield)
+        mutable
+        {
+            try
+            {
+                AsyncSendQuitCmd(yield);
+                ISXResponse::SMTPResponse::CheckStatus(
+                    m_smart_socket->AsyncReadCoroutine(yield), ISXResponse::StatusType::PositiveCompletion);
+                promise.set_value();
+            }
+            catch(...)
+            {
+                promise.set_exception(std::current_exception());
+            };
+        }
+    );
+
+    return future;
+};
+
+bool SmtpClient::Reset()
+{
+    m_smart_socket = std::make_unique<ISXSmartSocket::SmartSocket>(
+        m_smart_socket->GetIoContext(), m_smart_socket->GetSslContext());
+
+    return true;
+};
+
 bool SmtpClient::Dispose()
 {
     return m_smart_socket->Close();
+};
+
+bool SmtpClient::ConnectionIsOpen()
+{
+    return m_smart_socket->IsOpen();
 };
 
 bool SmtpClient::SetTimeout(int timeout)
@@ -222,29 +262,24 @@ bool SmtpClient::AsyncUpgradeSecurity(asio::yield_context& yield)
     return m_smart_socket->AsyncUpgradeSecurityCoroutine(yield);
 };
 
-bool SmtpClient::AsyncSendMailFromCmd(const ISXMM::MailMessage& mail_message, asio::yield_context& yield)
+bool SmtpClient::AsyncSendMailFromCmd(const ISXMM::MailAddress& mail_address, asio::yield_context& yield)
 {
     string query = (format("%1%: <%2%> \r\n")
         % S_CMD_MAIL_FROM
-        % mail_message.from.get_address()).str();
+        % mail_address.get_address()).str();
 
     return m_smart_socket->AsyncWriteCoroutine(query, yield);
 };
 
-bool SmtpClient::AsyncSendRcptToCmd(const ISXMM::MailMessage& mail_message, asio::yield_context& yield)
+bool SmtpClient::AsyncSendRcptToCmd(const ISXMM::MailAddress& mail_address, asio::yield_context& yield)
 {
-    for (auto&group : {mail_message.to, mail_message.cc, mail_message.bcc})
-    {
-        for (auto& to : group)
-        {
-            string query = (format("%1%: <%2%> \r\n")
-                % S_CMD_RCPT_TO
-                % to.get_address()).str();
-            m_smart_socket->AsyncWriteCoroutine(query, yield);
-        }
-    }
-    
-    return true;
+
+    string query = (format("%1%: <%2%> \r\n")
+        % S_CMD_RCPT_TO
+        % mail_address.get_address()).str();
+            
+
+    return m_smart_socket->AsyncWriteCoroutine(query, yield);
 }
 
 bool SmtpClient::AsyncSendDataCmd(asio::yield_context& yield)
@@ -254,9 +289,6 @@ bool SmtpClient::AsyncSendDataCmd(asio::yield_context& yield)
 
 bool SmtpClient::AsyncSendQuitCmd(asio::yield_context& yield)
 {
-    bool quited = m_smart_socket->AsyncWriteCoroutine(S_CMD_QUIT + "\r\n", yield);
-    ISXResponse::SMTPResponse::CheckStatus(
-        m_smart_socket->AsyncReadCoroutine(yield), ISXResponse::StatusType::PositiveCompletion);
-    return quited;
+    return m_smart_socket->AsyncWriteCoroutine(S_CMD_QUIT + "\r\n", yield);
 };
 }; // namespace ISXSC

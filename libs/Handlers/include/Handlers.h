@@ -17,6 +17,9 @@ public:
         const string& server, const int port
         , const boost::system::error_code& error_code);
 
+    static bool HandleRemoteEndpointOp(
+        const boost::system::error_code& error_code);
+
     static bool HandleWrite(
         const string& data
         , const boost::system::error_code& error_code);
@@ -26,7 +29,8 @@ public:
         , const boost::system::error_code& error_code);
 
     static bool HandleClose(
-        const boost::system::error_code& error_code);
+        const boost::system::error_code& error_code
+        , bool* ssl_toggle);
 
     static bool HandleUpgradeSecurity(
         const boost::system::error_code& error_code
@@ -35,6 +39,9 @@ public:
 private:
     static inline void HandleError(
         const string& prefix, const boost::system::error_code& error_code);
+    
+    static inline void HandleTimeout(
+        const boost::system::error_code& error_code);
         
     SmartSocketMethodsHandlers() = delete;
     ~SmartSocketMethodsHandlers() = delete;
