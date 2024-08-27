@@ -11,8 +11,8 @@ find_package(OpenSSL REQUIRED)
 # Find Boost package with all requirements
 find_package(Boost 1.70 REQUIRED COMPONENTS system coroutine)
 
-# Add executable target
-add_executable(client)
+# Add library
+add_library(client)
 
 # Specify source files
 target_sources(client PRIVATE
