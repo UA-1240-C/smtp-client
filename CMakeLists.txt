@@ -17,7 +17,6 @@ add_library(client)
 # Specify source files
 target_sources(client PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SmtpClient.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
 
 # Include directories for the client target
