@@ -11,7 +11,7 @@ find_package(OpenSSL REQUIRED)
 # Find Boost package with all requirements
 find_package(Boost 1.70 REQUIRED COMPONENTS system coroutine)
 
-# Add library
+# Add executable target
 add_library(client)
 
 # Specify source files
@@ -21,7 +21,7 @@ target_sources(client PRIVATE
 )
 
 # Include directories for the client target
-target_include_directories(client PRIVATE
+target_include_directories(client PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${Boost_INCLUDE_DIRS}
 )
@@ -48,7 +48,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/MessageSender)
 add_subdirectory(tests)
 
 # Link libraries to the client target
-target_link_libraries(client PRIVATE
+target_link_libraries(client PUBLIC
     OpenSSL::SSL
     OpenSSL::Crypto
     SmartSocket
@@ -58,5 +58,3 @@ target_link_libraries(client PRIVATE
     MailMessage
     MessageSender
 )
-
-
