@@ -34,7 +34,7 @@ public:
     SmtpClient(asio::io_context& io_context, asio::ssl::context& ssl_context);
     ~SmtpClient();
 
-    future<void> AsyncConnect(const string& server, int port);
+    future<void> AsyncConnect(const string& server, std::uint16_t port);
     future<void> AsyncRegister(const string& username, const string& password);
     future<void> AsyncAuthenticate(const string& username, const string& password);
     future<void> AsyncSendMail(const ISXMM::MailMessage& mail_message);
