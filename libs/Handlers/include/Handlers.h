@@ -40,7 +40,7 @@ private:
     static inline void HandleError(
         const string& prefix, const boost::system::error_code& error_code);
     
-    static bool HandleTimeout(
+    static bool LogIfTimeout(
         const boost::system::error_code& error_code);
         
     SmartSocketMethodsHandlers() = delete;

@@ -4,6 +4,8 @@
 #include "MailMessage.h"
 #include "MailAttachment.h"
 
+#include <iostream>
+
 namespace ISXMM
 {
 MailMessageBuilder& MailMessageBuilder::set_from(const std::string& email, const std::string& name)
@@ -50,7 +52,7 @@ MailMessageBuilder& MailMessageBuilder::add_attachment(const std::string &path)
     }
     catch(const std::exception& e)
     {
-        throw e;
+        std::cerr << "Attachment error - " << e.what() << std::endl;
     }
     
     return *this;

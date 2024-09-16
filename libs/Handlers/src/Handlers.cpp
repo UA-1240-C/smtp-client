@@ -11,7 +11,7 @@ void SmartSocketMethodsHandlers::HandleError(
     throw std::runtime_error(error_code.message());
 };
 
-bool SmartSocketMethodsHandlers::HandleTimeout(
+bool SmartSocketMethodsHandlers::LogIfTimeout(
     const boost::system::error_code& error_code)
 {
     if (error_code == boost::asio::error::operation_aborted)
@@ -61,7 +61,7 @@ bool SmartSocketMethodsHandlers::HandleWrite(
         return true;
     }
 
-    HandleTimeout(error_code);
+    LogIfTimeout(error_code);
     HandleError("Write error", error_code);
     return false;
 };
@@ -93,7 +93,7 @@ ISXResponse::SMTPResponse SmartSocketMethodsHandlers::HandleRead(
         return smtp_response;
     };
 
-    HandleTimeout(error_code);
+    LogIfTimeout(error_code);
     HandleError("Reading error", error_code);
 };
 
