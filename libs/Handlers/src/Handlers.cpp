@@ -17,7 +17,9 @@ void SmartSocketMethodsHandlers::HandleTimeout(
     if (error_code == boost::asio::error::operation_aborted)
     {
         *s_log_stream << "Log: Timeout maybe reached" << std::endl;
-    };
+    } else {
+        *s_log_stream << "Log: Unhandled error - " << error_code.message() << std::endl;
+    }
 };
 
 bool SmartSocketMethodsHandlers::HandleConnection(
