@@ -20,8 +20,8 @@ public:
     ~AccessTokenFetcher();
 
     int FetchAccessToken();
-    void SetAuthorizationCode(const std::string& authorization_code);
-    std::string GetAccessToken() const;
+    void set_authorization_code(const std::string& authorization_code);
+    std::string get_access_token() const;
 
 private:
     std::string m_authorization_code;

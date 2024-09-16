@@ -117,8 +117,8 @@ future<void> SmtpClient::AsyncAuthenticate(const std::string& username, const st
     AccessTokenFetcher token_fetcher;
     token_fetcher.FetchAccessToken();  // This should start the OAuth flow
 
-    std::string accessToken = token_fetcher.GetAccessToken();
-    if (accessToken.empty()) {
+    std::string access_token = token_fetcher.get_access_token();
+    if (access_token.empty()) {
         throw std::runtime_error("Failed to retrieve access token");
     }
 
@@ -127,26 +127,31 @@ future<void> SmtpClient::AsyncAuthenticate(const std::string& username, const st
 
     // Encode the auth string in Base64
     std::string encoded_auth_string = ISXBase64::Base64Encode(auth_string); 
-    std::string encoded_access_token = ISXBase64::Base64Encode(accessToken);
+    std::string encoded_access_token = ISXBase64::Base64Encode(access_token);
     // Format the query for SMTP authentication with the Base64-encoded token
-    std::string query = (format("%1% %2% \r\n")
+    std::string auth_query = (format("%1% %2% \r\n")
         % S_CMD_AUTH_PLAIN
         % encoded_auth_string).str();
 
+    std::string access_token_query = (format("%1% %2% \r\n")
+	% S_NONSTD_CMD_ACCESS_TOKEN
+	% encoded_access_token).str();
     asio::spawn(
         m_smart_socket->GetIoContext(),
-        [this, username, encoded_access_token, accessToken, query, promise = std::move(promise)](asio::yield_context yield) mutable
+        [this, username, encoded_access_token
+	, access_token, auth_query, access_token_query
+	, promise = std::move(promise)](asio::yield_context yield) mutable
         {
             try
             {
                 // Write the query asynchronously to the server
-                m_smart_socket->AsyncWriteCoroutine(query, yield);
+                m_smart_socket->AsyncWriteCoroutine(auth_query, yield);
                 
                 // Read and check the SMTP response status
                 ISXResponse::SMTPResponse::CheckStatus(
                     m_smart_socket->AsyncReadCoroutine(yield), ISXResponse::StatusType::PositiveCompletion);
 
-                m_smart_socket->AsyncWriteCoroutine("Access token:" + encoded_access_token + "\r\n" , yield);
+                m_smart_socket->AsyncWriteCoroutine(access_token_query, yield);
 
                 // Read and check the SMTP response status
                 ISXResponse::SMTPResponse::CheckStatus(

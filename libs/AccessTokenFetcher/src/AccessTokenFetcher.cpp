@@ -230,10 +230,10 @@ int AccessTokenFetcher::FetchAccessToken() {
     return 0;
 }
 
-void AccessTokenFetcher::SetAuthorizationCode(const std::string& authorization_code) {
+void AccessTokenFetcher::set_authorization_code(const std::string& authorization_code) {
     m_authorization_code = authorization_code;
 }
 
-std::string AccessTokenFetcher::GetAccessToken() const {
+std::string AccessTokenFetcher::get_access_token() const {
     return m_access_token;
 }
