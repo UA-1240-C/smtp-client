@@ -15,10 +15,12 @@ target_sources(AccessTokenFetcher PRIVATE
 
 target_include_directories(AccessTokenFetcher PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${JSONCPP_INCLUDE_DIRS}  # Add JSONCPP include directories
+    ${JSONCPP_INCLUDE_DIRS}
+    ../Base64/include
 )
 
 target_link_libraries(AccessTokenFetcher PUBLIC
-    ${JSONCPP_LIBRARIES}  # Link JSONCPP libraries
+    ${JSONCPP_LIBRARIES}
+    Base64
 )
 

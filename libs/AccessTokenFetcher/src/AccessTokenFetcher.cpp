@@ -1,4 +1,6 @@
 #include "AccessTokenFetcher.h"
+#include "Base64.h"
+
 #include <iostream>
 #include <iomanip>
 
@@ -66,33 +68,15 @@ void AccessTokenFetcher::HandleRequest(tcp::socket& socket) {
 }
 
 int AccessTokenFetcher::OpenOAuthBrowser() const {
-    std::string base_url = "https://accounts.google.com/o/oauth2/auth";
-    std::string scope = "https://mail.google.com/";
-    std::string response_type = "code";
-    std::string access_type = "offline";
-    std::string redirect_uri = "http://localhost:8000/callback";
-    std::string client_id = "570952853562-5n34bmhjdsd6q7bovgf1g8ks6q6d930o.apps.googleusercontent.com";
-
-    std::ostringstream url;
-    url << base_url
-             << "?scope=" << scope
-             << "&response_type=" << response_type
-             << "&access_type=" << access_type
-             << "&redirect_uri=" << redirect_uri
-             << "&client_id=" << client_id
-             << "&prompt=" << "consent";
-
-	std::cout << url.str() << std::endl;
-
     // Construct the OAuth URL
     std::ostringstream full_url;
-    full_url << base_url
-             << "?scope=" << UrlEncode(scope)
-             << "&response_type=" << UrlEncode(response_type)
-             << "&access_type=" << UrlEncode(access_type)
-             << "&redirect_uri=" << UrlEncode(redirect_uri)
-             << "&client_id=" << UrlEncode(client_id)
-             << "&prompt=" << "consent";
+    full_url << BASE_URL
+             << "?scope=" << UrlEncode(SCOPE)
+             << "&response_type=" << UrlEncode(RESPONSE_TYPE)
+             << "&access_type=" << UrlEncode(ACCESS_TYPE)
+             << "&redirect_uri=" << UrlEncode(REDIRECT_URI)
+             << "&client_id=" << UrlEncode(CLIENT_ID)
+             << "&prompt=" << UrlEncode(PROMPT);
 
     std::string encoded_url = full_url.str();
     std::cout << "OAuth URL: " << encoded_url << std::endl;
@@ -102,7 +86,7 @@ int AccessTokenFetcher::OpenOAuthBrowser() const {
         std::string command = "xdg-open \"" + encoded_url + "\"";
         std::cout << command << std::endl;
     #elif defined(__APPLE__)
-        std::string command = "open '" + encoded_url + "'";
+        std::string command = "open \"" + encoded_url + "\"";
     #elif defined(_WIN32)
         std::string command = "start " + encoded_url;
     #else
@@ -147,22 +131,22 @@ void AccessTokenFetcher::ExchangeCodeForToken(const std::string& authorization_c
         tcp::resolver resolver{ioc};
         ssl::stream<tcp::socket> stream{ioc, ctx};
 
-        auto const results = resolver.resolve("oauth2.googleapis.com", "https");
+        auto const results = resolver.resolve(OAUTH_HOST, "https");
         asio::connect(stream.next_layer(), results.begin(), results.end());
 
         // Perform SSL handshake
         stream.handshake(ssl::stream_base::client);
 
         // URL-encode request parameters
-        std::string body = "client_id=" + UrlEncode("570952853562-5n34bmhjdsd6q7bovgf1g8ks6q6d930o.apps.googleusercontent.com") +
-                           "&client_secret=" + UrlEncode("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") +
+        std::string body = "client_id=" + UrlEncode(CLIENT_ID) +
+                           "&client_secret=" + UrlEncode(ISXBase64::Base64Decode(CLIENT_SECRET)) +
                            "&code=" + UrlEncode(authorization_code) +
-                           "&grant_type=" + UrlEncode("authorization_code") +
-                           "&redirect_uri=" + UrlEncode("http://localhost:8000/callback");
+                           "&grant_type=" + UrlEncode(GRANT_TYPE) +
+                           "&redirect_uri=" + UrlEncode(REDIRECT_URI);
 
         // Set up the POST request
         http::request<http::string_body> req{http::verb::post, "/token", 11};
-        req.set(http::field::host, "oauth2.googleapis.com");
+        req.set(http::field::host, OAUTH_HOST);
         req.set(http::field::content_type, "application/x-www-form-urlencoded");
         req.body() = body;
         req.prepare_payload();
