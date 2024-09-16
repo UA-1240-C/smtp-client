@@ -44,6 +44,9 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/MailMessage)
 # Add subdirectory for the MessageSender library
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/MessageSender)
 
+# Add subdirectory for the MessageSender library
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/AccessTokenFetcher)
+
 # Add subdirectory for the tests
 add_subdirectory(tests)
 
@@ -51,6 +54,7 @@ add_subdirectory(tests)
 target_link_libraries(client PRIVATE
     OpenSSL::SSL
     OpenSSL::Crypto
+    AccessTokenFetcher
     SmartSocket
     Base64
     ${Boost_LIBRARIES}

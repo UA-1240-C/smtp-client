@@ -1,6 +1,7 @@
 #include "SmtpClient.h"
 #include "SMTPResponse.h"
 #include "MessageSender.h"
+#include "AccessTokenFetcher.h"
 
 #include <iostream>
 
@@ -104,42 +105,62 @@ future<void> SmtpClient::AsyncRegister(const string& username, const string& pas
     return future;
 };
 
-future<void> SmtpClient::AsyncAuthenticate(const string& username, const string& password)
+future<void> SmtpClient::AsyncAuthenticate(const std::string& username, const std::string& password)
 {
     std::promise<void> promise;
     future<void> future = promise.get_future();
 
     m_username = username;
     m_password = password;
-    std::string auth_string = '\0' + username + '\0' + password;
-    std::string encoded_auth_string = ISXBase64::Base64Encode(auth_string);
 
+    // Use AccessTokenFetcher to retrieve the access token
+    AccessTokenFetcher token_fetcher;
+    token_fetcher.FetchAccessToken();  // This should start the OAuth flow
+
+    std::string accessToken = token_fetcher.GetAccessToken();
+    if (accessToken.empty()) {
+        throw std::runtime_error("Failed to retrieve access token");
+    }
+
+    // Concatenate username and access token (instead of password)
+    std::string auth_string = '\0' + username + '\0' + password;
+
+    // Encode the auth string in Base64
+    std::string encoded_auth_string = ISXBase64::Base64Encode(auth_string); 
+    std::string encoded_access_token = ISXBase64::Base64Encode(accessToken);
+    // Format the query for SMTP authentication with the Base64-encoded token
     std::string query = (format("%1% %2% \r\n")
         % S_CMD_AUTH_PLAIN
-        % encoded_auth_string).str();
+        % encoded_auth_string
+	% encoded_access_token).str();
 
     asio::spawn(
-        m_smart_socket->GetIoContext()
-        , [this, username, password, query, promise = std::move(promise)](asio::yield_context yield)
-        mutable
+        m_smart_socket->GetIoContext(),
+        [this, username, accessToken, query, promise = std::move(promise)](asio::yield_context yield) mutable
         {
             try
             {
+                // Write the query asynchronously to the server
                 m_smart_socket->AsyncWriteCoroutine(query, yield);
+
+                // Read and check the SMTP response status
                 ISXResponse::SMTPResponse::CheckStatus(
                     m_smart_socket->AsyncReadCoroutine(yield), ISXResponse::StatusType::PositiveCompletion);
 
+                // If the authentication is successful, set the promise value
                 promise.set_value();
             }
             catch(...)
             {
+                // Handle errors and set the exception on the promise
                 promise.set_exception(std::current_exception());
-            };
+            }
         }
     );
 
     return future;
-};
+}
+
 
 future<void> SmtpClient::AsyncSendMail(const ISXMM::MailMessage& mail_message)
 {
