@@ -46,6 +46,12 @@ private:
     SmartSocketMethodsHandlers() = delete;
     ~SmartSocketMethodsHandlers() = delete;
 
+    SmartSocketMethodsHandlers(const SmartSocketMethodsHandlers&) = delete;
+    SmartSocketMethodsHandlers& operator=(const SmartSocketMethodsHandlers&) = delete;
+
+    SmartSocketMethodsHandlers(SmartSocketMethodsHandlers&&) = delete;
+    SmartSocketMethodsHandlers& operator=(SmartSocketMethodsHandlers&&) = delete;
+
     static inline std::ostream* s_log_stream = &std::clog;
 };
 }; // namespace ISXLogs
