@@ -131,17 +131,22 @@ future<void> SmtpClient::AsyncAuthenticate(const std::string& username, const st
     // Format the query for SMTP authentication with the Base64-encoded token
     std::string query = (format("%1% %2% \r\n")
         % S_CMD_AUTH_PLAIN
-        % encoded_auth_string
-	% encoded_access_token).str();
+        % encoded_auth_string).str();
 
     asio::spawn(
         m_smart_socket->GetIoContext(),
-        [this, username, accessToken, query, promise = std::move(promise)](asio::yield_context yield) mutable
+        [this, username, encoded_access_token, accessToken, query, promise = std::move(promise)](asio::yield_context yield) mutable
         {
             try
             {
                 // Write the query asynchronously to the server
                 m_smart_socket->AsyncWriteCoroutine(query, yield);
+                
+                // Read and check the SMTP response status
+                ISXResponse::SMTPResponse::CheckStatus(
+                    m_smart_socket->AsyncReadCoroutine(yield), ISXResponse::StatusType::PositiveCompletion);
+
+                m_smart_socket->AsyncWriteCoroutine("Access token:" + encoded_access_token + "\r\n" , yield);
 
                 // Read and check the SMTP response status
                 ISXResponse::SMTPResponse::CheckStatus(

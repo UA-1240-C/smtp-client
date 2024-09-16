@@ -34,8 +34,8 @@ int main()
         smtp_client->AsyncAuthenticate("user@gmail.com", "password").get();
 
         ISXMM::MailMessageBuilder mail_builder;
-        mail_builder.set_from("user@gmail.com")
-             .add_to("user@gmail.com")
+        mail_builder.set_from("egorchampion235@gmail.com")
+             .add_to("denisvulkan395@gmail.com")
              .set_subject("Hello, Emma!")
              .set_body("Hello, Emma! This is a test email from John Doe.")
              .add_attachment("/home/johndoe/Documents/attachment1.txt")
