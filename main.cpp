@@ -31,14 +31,15 @@ int main()
     try
     {
         smtp_client->AsyncConnect("smtp.gmail.com", 587).get();
-        smtp_client->AsyncAuthenticate("yehorfur@gmail.com", "bwhp mwfr utdv udcj").get();
+        smtp_client->AsyncAuthenticate("user@gmail.com", "password").get();
 
         ISXMM::MailMessageBuilder mail_builder;
-        mail_builder.set_from("yehorfur@gmail.com")
-             .add_to("yehorfurbp@gmail.com")
+        mail_builder.set_from("user@gmail.com")
+             .add_to("user@gmail.com")
              .set_subject("Hello, Emma!")
-             .set_body("Hello, Emma! This is a test email from John Doe. TEST TIMROUTERROR")
-             .add_attachment("/home/yehorfur/attachment1.txt");
+             .set_body("Hello, Emma! This is a test email from John Doe.")
+             .add_attachment("/home/johndoe/Documents/attachment1.txt")
+             .add_attachment("/home/johndoe/Documents/attachment2.txt");
 
         smtp_client->AsyncSendMail(mail_builder.Build()).get();
         finish(io_context, worker, smtp_client);
