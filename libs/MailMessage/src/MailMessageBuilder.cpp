@@ -5,6 +5,7 @@
 #include "MailAttachment.h"
 
 #include <iostream>
+#include <fstream>
 
 namespace ISXMM
 {
@@ -46,13 +47,11 @@ MailMessageBuilder& MailMessageBuilder::set_body(const std::string& body)
 
 MailMessageBuilder& MailMessageBuilder::add_attachment(const std::string &path)
 {
-    try
-    {
-        m_attachments.push_back({ path }); 
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << "Attachment error - " << e.what() << std::endl;
+    std::ifstream file(path);
+    if (file.good()) {
+        m_attachments.push_back({ path });
+    } else {
+        std::cerr << "C: Attachment file does not exist: " << path << std::endl;
     }
     
     return *this;
