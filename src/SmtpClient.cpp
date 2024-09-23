@@ -32,7 +32,7 @@ SmtpClient::~SmtpClient()
     }
 };
 
-future<void> SmtpClient::AsyncConnect(const string& server, int port)
+future<void> SmtpClient::AsyncConnect(const string& server, std::uint16_t port)
 {
     std::promise<void> promise;
     future<void> future = promise.get_future();

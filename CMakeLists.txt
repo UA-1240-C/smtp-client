@@ -26,8 +26,8 @@ target_include_directories(client PRIVATE
     ${Boost_INCLUDE_DIRS}
 )
 
-# Ad subdirectory for the ErrorHandlers library
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/Handlers)
+# # Ad subdirectory for the ErrorHandlers library
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/Handlers)
 
 # Add subdirectory for the Base64 library
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/Base64)

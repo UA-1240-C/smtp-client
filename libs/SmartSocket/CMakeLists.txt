@@ -6,12 +6,21 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_library(SmartSocket STATIC)
 
+if(WIN32 AND MINGW)
+    message("Windows and mingw detected")
+    find_package(OpenSSL REQUIRED)
+
+    target_link_libraries(SmartSocket PUBLIC 
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        ws2_32
+    )
+endif()
+
+
+
 target_sources(SmartSocket PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SmartSocket.cpp
-)
-
-target_link_libraries(SmartSocket PRIVATE
-    Handlers
 )
 
 target_include_directories(SmartSocket PUBLIC
