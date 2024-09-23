@@ -5,7 +5,7 @@
 #include "MailMessageFormatter.h"
 #include "Base64.h"
 
-
+#undef SendMessage
 
 namespace ISXMS
 {
