@@ -28,6 +28,13 @@ struct TimerResults
     TimerResults();
 };
 
-std::ostream& operator<<(std::ostream& os, const TimerResults& results) ;
+std::ostream& operator<<(std::ostream& os, const TimerResults& results);
+
+struct SamplerResults
+{
+    double total_duration;
+    TimerResults commands_duration;
+    bool is_successful;
+};
 
 }

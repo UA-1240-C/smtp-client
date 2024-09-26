@@ -73,7 +73,7 @@ void SMTPSampler::ExecuteInstance(uint32_t m_thread_id)
     }
     delete smtp_client.release();
 
-    Listener::getInstance().logResult(m_thread_id, timer_global.GetDuration(), timer_results, is_successful);  // true = success
+    Listener::GetInstance().LogResult(m_thread_id, timer_global.GetDuration(), timer_results, is_successful);  // true = success
 }
 
 }

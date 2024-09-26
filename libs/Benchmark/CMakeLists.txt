@@ -10,6 +10,7 @@ add_library(Benchmark STATIC)
 target_sources(Benchmark PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ThreadManager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SMTPSampler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Listener.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils.cpp
 )
 
