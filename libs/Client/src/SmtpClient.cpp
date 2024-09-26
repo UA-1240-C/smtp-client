@@ -28,7 +28,7 @@ SmtpClient::~SmtpClient()
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Exception in destructor catched while quitting, session could have been broken: " << e.what() << std::endl;
+        // std::cerr << "Exception in destructor catched while quitting, session could have been broken: " << e.what() << std::endl;
     }
 };
 

@@ -167,7 +167,7 @@ std::unique_ptr<asio::steady_timer> SmartSocket::StartTimer(
 void MethodsHandlers::HandleError(
     const string& prefix, const boost::system::error_code& error_code)
 {
-    *s_log_stream << prefix << ": " << error_code.message() << std::endl;
+    //*s_log_stream << prefix << ": " << error_code.message() << std::endl;
     throw std::runtime_error(error_code.message());
 };
 
@@ -175,12 +175,12 @@ bool MethodsHandlers::LogIfTimeout(const boost::system::error_code& error_code)
 {
     if (error_code == boost::asio::error::operation_aborted)
     {
-        *s_log_stream << "Log: Timeout maybe reached" << std::endl;
+        //*s_log_stream << "Log: Timeout maybe reached" << std::endl;
         return true;
     }
     else
     {
-        *s_log_stream << "Log: Unhandled error - " << error_code.message() << std::endl;
+        //*s_log_stream << "Log: Unhandled error - " << error_code.message() << std::endl;
         return false;
     }
 }
@@ -191,7 +191,7 @@ bool MethodsHandlers::HandleConnection(
 {
     if (!error_code)
     {
-        *s_log_stream << "Log: " << "Successfully connected to " << server << ":" << port << std::endl;
+        //*s_log_stream << "Log: " << "Successfully connected to " << server << ":" << port << std::endl;
         return true;
     }
 
@@ -218,7 +218,7 @@ bool MethodsHandlers::HandleWrite(
 {
     if (!error_code)
     {
-        *s_log_stream << "C: " << data;
+        //*s_log_stream << "C: " << data;
         return true;
     }
 
@@ -249,7 +249,7 @@ ISXResponse::SMTPResponse MethodsHandlers::HandleRead(
         );
         
         ISXResponse::SMTPResponse smtp_response(response.str());
-        *s_log_stream << smtp_response.get_formated_response();
+        //*s_log_stream << smtp_response.get_formated_response();
 
         return smtp_response;
     };
@@ -264,7 +264,7 @@ bool MethodsHandlers::HandleClose(
 {
     if (!error_code)
     {
-        *s_log_stream << "Log: " << "Connection closed" << std::endl;
+        //*s_log_stream << "Log: " << "Connection closed" << std::endl;
         *ssl_toggle = false;
         return true;
     }
@@ -279,7 +279,7 @@ bool MethodsHandlers::HandleUpgradeSecurity(
 {
     if (!error_code)
     {
-        *s_log_stream << "Log: " << "Handshake successful. Connection upgraded to TLS" << std::endl;
+        //*s_log_stream << "Log: " << "Handshake successful. Connection upgraded to TLS" << std::endl;
         *ssl_toggle = true;
         return true;
     }
