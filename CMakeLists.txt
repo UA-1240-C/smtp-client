@@ -16,7 +16,7 @@ add_executable(client)
 
 # Specify source files
 target_sources(client PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/SmtpClient.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/SmtpClient.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
 
@@ -26,8 +26,8 @@ target_include_directories(client PRIVATE
     ${Boost_INCLUDE_DIRS}
 )
 
-# # Ad subdirectory for the ErrorHandlers library
-# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/Handlers)
+# Add subdirectory for the Client library
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/Client)
 
 # Add subdirectory for the Base64 library
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/Base64)
@@ -54,6 +54,7 @@ target_link_libraries(client PRIVATE
     SmartSocket
     Base64
     ${Boost_LIBRARIES}
+    SMTP_client
     SMTPResponse
     MailMessage
     MessageSender
