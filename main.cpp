@@ -68,8 +68,10 @@
 #include "ThreadManager.h"
 #include "SMTPSampler.h"
 
+using namespace ISXBenchmark;
+
 int main()
 {
-    ThreadManager tm(40, std::chrono::duration<double>(1), 1, std::make_unique<SMTPSampler>());
+    ThreadManager tm(20, std::chrono::duration<double>(1), 1, std::make_unique<SMTPSampler>());
     tm.Start();
 }

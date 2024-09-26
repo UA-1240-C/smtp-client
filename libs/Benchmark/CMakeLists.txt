@@ -6,22 +6,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_library(Benchmark STATIC)
 
-# if(WIN32 AND MINGW)
-#     message("Windows and mingw detected")
-#     find_package(OpenSSL REQUIRED)
-
-#     target_link_libraries(SmartSocket PUBLIC 
-#         OpenSSL::SSL
-#         OpenSSL::Crypto
-#         ws2_32
-#     )
-# endif()
-
 
 target_sources(Benchmark PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ThreadManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/SMTPSampler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils.cpp
-
 )
 
 target_include_directories(Benchmark PUBLIC

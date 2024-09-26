@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+namespace ISXBenchmark {
+
 class Sampler 
 {
 public:
@@ -11,3 +13,5 @@ public:
     virtual bool Setup() = 0;
     virtual void ExecuteInstance(uint32_t m_thread_id) = 0;
 };
+
+}

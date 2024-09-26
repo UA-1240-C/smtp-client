@@ -6,6 +6,8 @@
 #include <iomanip>  
 #include <sstream>  
 
+namespace ISXBenchmark {
+
 std::string CurrentTimeToString();
 
 class Timer 
@@ -27,3 +29,5 @@ struct TimerResults
 };
 
 std::ostream& operator<<(std::ostream& os, const TimerResults& results) ;
+
+}

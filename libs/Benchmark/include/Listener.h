@@ -6,6 +6,8 @@
 
 #include "Utils.h"
 
+namespace ISXBenchmark {
+
 class Listener {
 public:
     static Listener& getInstance() {
@@ -24,3 +26,5 @@ private:
     Listener() = default;
     std::mutex mutex_;  // For thread-safe logging
 };
+
+}

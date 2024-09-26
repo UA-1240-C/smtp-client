@@ -1,5 +1,7 @@
 #include "Utils.h"
 
+namespace ISXBenchmark {
+
 std::ostream& operator<<(std::ostream& os, const TimerResults& results) {
     os << "EHLO Duration: " << results.ehlo_duration << "s; ";
     os << "Auth Duration: " << results.auth_duration << "s; ";
@@ -26,4 +28,6 @@ std::string CurrentTimeToString()
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&now_time_t), "%Y-%m-%d %H:%M:%S");
     return oss.str();
+}
+
 }
