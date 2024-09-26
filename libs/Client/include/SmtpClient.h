@@ -29,7 +29,7 @@ public:
     inline static const string S_CMD_DATA = "DATA";
     inline static const string S_CMD_QUIT = "QUIT";
 
-    inline static const std::uint8_t S_DEFAULT_TIMEOUT = 5;
+    inline static const std::uint8_t S_DEFAULT_TIMEOUT = 1;
 
     SmtpClient(asio::io_context& io_context, asio::ssl::context& ssl_context);
     ~SmtpClient();

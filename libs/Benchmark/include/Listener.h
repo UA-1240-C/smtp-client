@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "Utils.h"
+
 class Listener {
 public:
     static Listener& getInstance() {
@@ -11,10 +13,10 @@ public:
         return instance;
     }
 
-    void logResult(int thread_id, double time_taken, bool success) {
+    void logResult(int thread_id, double time_taken, TimerResults& results, bool success) {
         std::lock_guard<std::mutex> lock(mutex_);
         std::ofstream log_file("results.log", std::ios::app);
-        log_file << "Thread " << thread_id << ": Time = " << time_taken << "s, Success = " << success << "\n";
+        log_file << "Thread " << thread_id << ": Time = " << time_taken << "s, " << results <<" Success = " << success << "\n";
         log_file.close();
     }
 
