@@ -30,4 +30,11 @@ std::string CurrentTimeToString()
     return oss.str();
 }
 
+SamplerResults::SamplerResults(double total_duration, TimerResults& commands_duration, bool is_successful)
+ : total_duration(total_duration), commands_duration(commands_duration),
+   is_successful(is_successful)
+   {
+
+   }
+
 }

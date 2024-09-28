@@ -28,6 +28,13 @@ struct TimerResults
     TimerResults();
 };
 
+template<typename Func, typename... Args>
+inline double MeasureDuration(Func&& func, Args&&... args) {
+    Timer timer;
+    std::forward<Func>(func)(std::forward<Args>(args)...);
+    return timer.GetDuration();
+}
+
 std::ostream& operator<<(std::ostream& os, const TimerResults& results);
 
 struct SamplerResults
@@ -35,6 +42,8 @@ struct SamplerResults
     double total_duration;
     TimerResults commands_duration;
     bool is_successful;
+
+    SamplerResults(double total_duration, TimerResults& commands_duration, bool is_successful);
 };
 
 }

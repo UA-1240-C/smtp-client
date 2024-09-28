@@ -73,5 +73,5 @@ using namespace ISXBenchmark;
 int main()
 {
     ThreadManager tm(20, std::chrono::duration<double>(1), 1, std::make_unique<SMTPSampler>());
-    tm.Start();
+    std::cout << tm.Start() << std::endl;
 }

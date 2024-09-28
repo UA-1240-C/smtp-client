@@ -4,22 +4,22 @@ namespace ISXBenchmark {
 
 ThreadManager::ThreadManager(uint16_t num_threads, std::chrono::duration<double> ramp_up_period,
                              uint16_t loop_count, std::unique_ptr<Sampler> sampler)
-    : m_num_threads(num_threads), m_ramp_up_period(ramp_up_period),
-        m_loop_count(loop_count), m_sampler(std::move(sampler)) {}
+    : NUM_THREADS(num_threads), RAMP_UP_PERIOD(ramp_up_period),
+        LOOP_COUNT(loop_count), m_sampler(std::move(sampler)) {}
 
-void ThreadManager::Start() 
+std::string ThreadManager::Start() 
 {
     if (!m_sampler->Setup()) 
     {
         std::cerr << "Failure during setup of sampler\n";
-        return;
+        return "Failure during setup of sampler\n";
     }
 
-    auto delay = m_ramp_up_period / m_num_threads;
+    auto delay = RAMP_UP_PERIOD / NUM_THREADS;
 
-    for (uint16_t i = 0; i < m_loop_count; i++) 
+    for (uint16_t i = 0; i < LOOP_COUNT; i++) 
     {
-        for (uint16_t i = 0; i < m_num_threads; ++i) 
+        for (uint16_t i = 0; i < NUM_THREADS; ++i) 
         {
             m_threads.emplace_back(&ThreadManager::Run, this, i, std::ref(*m_sampler));
             std::this_thread::sleep_for(delay);
@@ -29,6 +29,7 @@ void ThreadManager::Start()
             thread.join();
         }
     }
+    return m_sampler->CalculateStatistics();
 }
 
 void ThreadManager::Run(uint16_t thread_id, Sampler& sampler) 

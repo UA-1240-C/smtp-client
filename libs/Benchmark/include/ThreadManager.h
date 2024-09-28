@@ -17,14 +17,14 @@ public:
     ThreadManager(uint16_t num_threads, std::chrono::duration<double> ramp_up_period,
                   uint16_t loop_count, std::unique_ptr<Sampler> sampler);
 
-    void Start();
+    std::string Start();
 
 private:
     void Run(uint16_t thread_id, Sampler& sampler);
 
-    uint16_t m_num_threads;
-    std::chrono::duration<double> m_ramp_up_period;
-    uint16_t m_loop_count;
+    const uint16_t NUM_THREADS;
+    const std::chrono::duration<double> RAMP_UP_PERIOD;
+    const uint16_t LOOP_COUNT;
     std::vector<std::thread> m_threads;
     std::unique_ptr<Sampler> m_sampler;
     
