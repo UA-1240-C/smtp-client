@@ -3,7 +3,7 @@
 namespace ISXBenchmark {
 
 std::ostream& operator<<(std::ostream& os, const TimerResults& results) {
-    os << "EHLO Duration: " << results.ehlo_duration << "s; ";
+    os << "EHLO Duration: " << results.establish_connection_duration << "s; ";
     os << "Auth Duration: " << results.auth_duration << "s; ";
     os << "Send Mail Duration: " << results.send_mail_duration << "s ;";
     return os;
@@ -17,7 +17,7 @@ double Timer::GetDuration() const
     return duration.count();
 }
 
-TimerResults::TimerResults() : ehlo_duration(-1), auth_duration(-1), send_mail_duration(-1) {}
+TimerResults::TimerResults() : establish_connection_duration(-1), auth_duration(-1), send_mail_duration(-1) {}
 
 
 std::string CurrentTimeToString() 

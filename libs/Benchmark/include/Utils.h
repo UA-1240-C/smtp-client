@@ -21,7 +21,7 @@ private:
 
 struct TimerResults 
 {
-    double ehlo_duration;
+    double establish_connection_duration;
     double auth_duration;
     double send_mail_duration;
 

@@ -48,7 +48,7 @@ void SMTPSampler::ExecuteInstance(uint32_t m_thread_id)
 
     try
     {   
-        timer_results.ehlo_duration = MeasureDuration([&]() {
+        timer_results.establish_connection_duration = MeasureDuration([&]() {
             smtp_client->AsyncConnect("127.0.0.1", 2525).get();
         });
 
@@ -86,7 +86,7 @@ std::string SMTPSampler::CalculateStatistics()
     int total_samples = results.size();
     int error_count = 0;
 
-    DurationStats total_stats, ehlo_stats, auth_stats, send_stats;
+    DurationStats total_stats, establishing_connection_stats, auth_stats, send_stats;
 
     for (const auto& sample : results) {
         if (!sample.is_successful) {
@@ -94,7 +94,7 @@ std::string SMTPSampler::CalculateStatistics()
         } else {
             total_stats.Update(sample.total_duration);
 
-            ehlo_stats.Update(sample.commands_duration.ehlo_duration);
+            establishing_connection_stats.Update(sample.commands_duration.establish_connection_duration);
             auth_stats.Update(sample.commands_duration.auth_duration);
             send_stats.Update(sample.commands_duration.send_mail_duration);
         }
@@ -107,7 +107,7 @@ std::string SMTPSampler::CalculateStatistics()
     ss << "Error percentage: " << error_percentage << "%\n";
 
     PrintStats(ss, "Total", total_stats);
-    PrintStats(ss, "EHLO", ehlo_stats);
+    PrintStats(ss, "Establishing connnection", establishing_connection_stats);
     PrintStats(ss, "AUTH", auth_stats);
     PrintStats(ss, "SEND_MAIL", send_stats);
     
