@@ -8,6 +8,7 @@
 #include <sstream>
 #include <regex>
 #include <future>
+#include <iostream>
 
 #include "SMTPResponse.h"
 
@@ -19,6 +20,8 @@ using std::function;
 
 namespace ISXSmartSocket
 {
+//class MethodsHandlers;
+
 class SmartSocket
 {
 public:
@@ -42,6 +45,8 @@ public:
     bool AsyncUpgradeSecurityCoroutine(asio::yield_context& yield);
     bool Close();
 
+    friend class MethodsHandlers;
+    
 private:
     std::unique_ptr<asio::steady_timer> StartTimer(
         int seconds, asio::yield_context& yield, system::error_code& ec);
@@ -57,5 +62,50 @@ private:
     asio::io_context& m_io_context;
     asio::ssl::context& m_ssl_context;
     asio::ssl::stream<tcp::socket> m_socket;
+
+};
+
+class MethodsHandlers
+{
+public:
+    static bool HandleConnection(
+        const string& server, const int port
+        , const boost::system::error_code& error_code);
+
+    static bool HandleRemoteEndpointOp(
+        const boost::system::error_code& error_code);
+
+    static bool HandleWrite(
+        const string& data
+        , const boost::system::error_code& error_code);
+
+    static ISXResponse::SMTPResponse HandleRead(
+        boost::asio::streambuf& buffer
+        , const boost::system::error_code& error_code);
+
+    static bool HandleClose(
+        const boost::system::error_code& error_code
+        , bool* ssl_toggle);
+
+    static bool HandleUpgradeSecurity(
+        const boost::system::error_code& error_code
+        , bool* ssl_toggle);
+private:
+    static inline void HandleError(
+        const string& prefix, const boost::system::error_code& error_code);
+    
+    static bool LogIfTimeout(
+        const boost::system::error_code& error_code);
+        
+    MethodsHandlers() = delete;
+    ~MethodsHandlers() = delete;
+
+    MethodsHandlers(const MethodsHandlers&) = delete;
+    MethodsHandlers& operator=(const MethodsHandlers&) = delete;
+
+    MethodsHandlers(MethodsHandlers&&) = delete;
+    MethodsHandlers& operator=(MethodsHandlers&&) = delete;
+
+    static inline std::ostream* s_log_stream = &std::clog;
 };
 }; // namespace ISXSmartSocket

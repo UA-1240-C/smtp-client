@@ -27,32 +27,32 @@ namespace ISXResponse
         }
     }
 
-    uint16_t SMTPResponse::get_code() const 
+    const std::uint16_t& SMTPResponse::get_code() const 
     {
         return m_code;
     }
 
-    std::string SMTPResponse::get_enhanced_code() const 
+    const std::string& SMTPResponse::get_enhanced_code() const 
     {
         return m_enhanced_code;
     }
 
-    std::string SMTPResponse::get_text() const 
+    const std::string& SMTPResponse::get_text() const 
     {
         return m_text;
     }
 
-    StatusType SMTPResponse::get_status() const 
+    const StatusType& SMTPResponse::get_status() const 
     {
         return m_status;
     }
 
-    std::string SMTPResponse::get_formated_response() const 
+    const std::string& SMTPResponse::get_formated_response() const 
     {
         return m_formated_response;
     }
 
-    std::string SMTPResponse::get_raw_response() const 
+    const std::string& SMTPResponse::get_raw_response() const 
     {
         return m_raw_response;
     }
