@@ -25,7 +25,7 @@ public:
 
     ~SMTPSampler() override;
 
-    bool Setup() override;
+    bool Setup(uint8_t timeout) override;
 
     void ExecuteInstance(uint32_t m_thread_id) override;
 

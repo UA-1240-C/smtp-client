@@ -7,9 +7,9 @@ ThreadManager::ThreadManager(uint16_t num_threads, std::chrono::duration<double>
     : NUM_THREADS(num_threads), RAMP_UP_PERIOD(ramp_up_period),
         LOOP_COUNT(loop_count), m_sampler(std::move(sampler)) {}
 
-std::string ThreadManager::Start() 
+std::string ThreadManager::Start(uint8_t timeout) 
 {
-    if (!m_sampler->Setup()) 
+    if (!m_sampler->Setup(timeout)) 
     {
         std::cerr << "Failure during setup of sampler\n";
         return "Failure during setup of sampler\n";

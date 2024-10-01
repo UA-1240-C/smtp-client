@@ -17,7 +17,7 @@ public:
     ThreadManager(uint16_t num_threads, std::chrono::duration<double> ramp_up_period,
                   uint16_t loop_count, std::unique_ptr<Sampler> sampler);
 
-    std::string Start();
+    std::string Start(uint8_t timeout);
 
 private:
     void Run(uint16_t thread_id, Sampler& sampler);

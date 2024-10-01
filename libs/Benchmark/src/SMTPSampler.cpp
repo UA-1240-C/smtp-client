@@ -18,8 +18,9 @@ SMTPSampler::~SMTPSampler()
         m_worker.join();
 };
 
-bool SMTPSampler::Setup()
+bool SMTPSampler::Setup(uint8_t timeout)
 {
+    m_timeout = timeout;
     try
     {
         m_ssl_context.set_verify_mode(boost::asio::ssl::verify_none);
@@ -42,6 +43,7 @@ void SMTPSampler::ExecuteInstance(uint32_t m_thread_id)
     Timer timer_global;
     
     std::unique_ptr<ISXSC::SmtpClient> smtp_client = std::make_unique<ISXSC::SmtpClient>(m_io_context, m_ssl_context);
+    smtp_client->SetTimeout(m_timeout);
     bool is_successful = true;
 
     TimerResults timer_results;
@@ -71,7 +73,6 @@ void SMTPSampler::ExecuteInstance(uint32_t m_thread_id)
     } 
     catch (const std::exception& e)
     {
-        std::cout << "Exception caught\n";
         is_successful = false;
     }
     delete smtp_client.release();
