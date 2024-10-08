@@ -32,9 +32,6 @@ public:
     std::string CalculateStatistics() override;
 
 private:
-    boost::asio::io_context m_io_context;
-    boost::asio::ssl::context m_ssl_context;
-    std::thread m_worker;
     Listener m_listener;
 
     struct DurationStats {
