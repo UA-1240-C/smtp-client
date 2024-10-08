@@ -40,13 +40,12 @@ bool SMTPSampler::Setup(uint8_t timeout)
 
 void SMTPSampler::ExecuteInstance(uint32_t m_thread_id)
 {
-    Timer timer_global;
-    
     std::unique_ptr<ISXSC::SmtpClient> smtp_client = std::make_unique<ISXSC::SmtpClient>(m_io_context, m_ssl_context);
     smtp_client->SetTimeout(m_timeout);
     bool is_successful = true;
-
     TimerResults timer_results;
+
+    Timer timer_global;
 
     try
     {   
