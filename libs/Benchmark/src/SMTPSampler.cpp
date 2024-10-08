@@ -19,55 +19,20 @@ bool SMTPSampler::Setup(uint8_t timeout)
 
 void SMTPSampler::ExecuteInstance(uint32_t m_thread_id)
 {
-    boost::asio::io_context io_context;
-    boost::asio::ssl::context ssl_context(boost::asio::ssl::context::tls_client);
-    ssl_context.set_verify_mode(boost::asio::ssl::verify_none);
+    SMTPContext smtp_context;
+    smtp_context.Initialize();
 
-    std::thread worker([&io_context]() {
-        asio::io_context::work work(io_context);
-        io_context.run();
-    });
-
-    std::unique_ptr<ISXSC::SmtpClient> smtp_client = std::make_unique<ISXSC::SmtpClient>(io_context, ssl_context);
+    std::unique_ptr<ISXSC::SmtpClient> smtp_client = std::make_unique<ISXSC::SmtpClient>(smtp_context.io_context, smtp_context.ssl_context);
     smtp_client->SetTimeout(m_timeout);
+    
     bool is_successful = true;
     TimerResults timer_results;
+    double global_duration = MeasureDuration(PerformMailOperations, *smtp_client, timer_results, is_successful);
 
-    Timer timer_global;
-    try
-    {   
-        timer_results.establish_connection_duration = MeasureDuration([&]() {
-            smtp_client->AsyncConnect("127.0.0.1", 2525).get();
-        });
-
-        timer_results.auth_duration =  MeasureDuration([&]() {
-            smtp_client->AsyncAuthenticate("user@gmail.com", "password").get();
-        });
-
-        std::string subject = "C++ benchmark subject " + CurrentTimeToString();
-        ISXMM::MailMessageBuilder mail_builder;
-        mail_builder.set_from("user@gmail.com")
-            .add_to("user@gmail.com")
-            .set_subject(subject)
-            .set_body("C++ benchmark body");
-
-        timer_results.send_mail_duration = MeasureDuration([&]() {
-            smtp_client->AsyncSendMail(mail_builder.Build()).get();
-        });
-    } 
-    catch (const std::exception& e)
-    {
-        is_successful = false;
-    }
     delete smtp_client.release();
+    smtp_context.Cleanup();
 
-    if (!io_context.stopped())
-        io_context.stop();
-
-    if (worker.joinable())
-        worker.join();
-
-    m_listener.LogResult(m_thread_id, timer_global.GetDuration(), timer_results, is_successful);  // true = success
+    m_listener.LogResult(m_thread_id, global_duration, timer_results, is_successful);  
 }
 
 std::string SMTPSampler::CalculateStatistics()
@@ -125,4 +90,32 @@ void SMTPSampler::PrintStats(std::ostream& os, const std::string& name, const SM
     os << name << " negative count: " << stats.negative_count << '\n';
 }
 
+void SMTPSampler::PerformMailOperations(ISXSC::SmtpClient& smtp_client, TimerResults& timer_results, bool& is_successful)
+{
+    try
+    {   
+        timer_results.establish_connection_duration = MeasureDuration([&]() {
+            smtp_client.AsyncConnect("127.0.0.1", 2525).get();
+        });
+
+        timer_results.auth_duration =  MeasureDuration([&]() {
+            smtp_client.AsyncAuthenticate("user@gmail.com", "password").get();
+        });
+
+        std::string subject = "C++ benchmark subject " + CurrentTimeToString();
+        ISXMM::MailMessageBuilder mail_builder;
+        mail_builder.set_from("user@gmail.com")
+            .add_to("user@gmail.com")
+            .set_subject(subject)
+            .set_body("C++ benchmark body");
+
+        timer_results.send_mail_duration = MeasureDuration([&]() {
+            smtp_client.AsyncSendMail(mail_builder.Build()).get();
+        });
+    } 
+    catch (const std::exception& e)
+    {
+        is_successful = false;
+    }
+}
 }
